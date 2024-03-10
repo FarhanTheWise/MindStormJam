@@ -17,11 +17,24 @@ public class PoliceOfficer : MonoBehaviour
     private float health = 1.5f; // Health value (between 0 and 1)
     [SerializeField]
     private GameObject smokeParticle;
+    [SerializeField]
+    private GameObject destroyParticle;
+    [SerializeField]
+    public GameObject[] tires;
+
+    private AudioSource audioSource;
+    [SerializeField]
+    private AudioClip destroyClip;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     // Start is called before the first frame update
     void Start()
     {
         UpdateHealthBar();
-        moveSpeed = Random.Range(12f,15f);
+        moveSpeed = Random.Range(30f,40f);
    playerTarget = GameObject.FindGameObjectWithTag("Player").transform;
         timeToShoot = delayTime;
     }
@@ -51,9 +64,30 @@ public class PoliceOfficer : MonoBehaviour
     // Function to decrease health
     public void DecreaseHealth(float amount)
     {
-        health -= amount; // Decrease health by the given amount
-        health = Mathf.Clamp01(health); // Ensure health stays between 0 and 1
-        UpdateHealthBar(); // Update the health bar
+        if (health > 0.1f)
+        {
+            health -= amount; // Decrease health by the given amount
+            health = Mathf.Clamp01(health); // Ensure health stays between 0 and 1
+            UpdateHealthBar(); // Update the health bar
+        }
+        else
+        {
+            audioSource.clip = destroyClip;
+            audioSource.Play();
+            Instantiate(destroyParticle, transform.position, transform.rotation);
+          for(int i=0; i < Random.Range(1,tires.Length); i++)
+            {
+               for(int j=0; j < Random.Range(1, tires.Length); j++)
+                {
+                    Destroy(tires[i].gameObject);
+                    Destroy(tires[j].gameObject);
+                }
+            }
+
+            
+            transform.GetChild(1).GetComponent<Rigidbody>().freezeRotation = false;
+            Destroy(this.gameObject,1.2f);
+        }
     }
 
     // Function to update the health bar

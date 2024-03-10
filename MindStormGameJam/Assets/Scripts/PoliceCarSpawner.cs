@@ -30,4 +30,9 @@ public class PoliceCarSpawner : MonoBehaviour
             numberOfSpawnCars--;
         }
     }
+
+   public int GetEnemyCars()
+    {
+        return numberOfSpawnCars;
+    }
 }
